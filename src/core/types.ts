@@ -7,7 +7,7 @@ export type MoviesResponse = {
   total_pages: number;
 };
 
-export type MovieRepsonse = {
+export type MovieResponse = {
   id: number;
   title: string;
   overview: string;
