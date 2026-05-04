@@ -1,16 +1,15 @@
 import { ImageGrid } from '@/components';
-import { MOVIE_ENDPOINT } from '@/core/constants';
-import type { CreditsResponse } from '@/core/types';
+import { getImageUrl, MOVIE_ENDPOINT, type CreditsResponse, type ImageCell } from '@/core';
 import { useTmdb } from '@/hooks';
 import { useParams } from 'react-router-dom';
 
 export const CreditsView = () => {
   const { id } = useParams();
-  const { data } = useTmdb<CreditsResponse>(`${MOVIE_ENDPOINT}/${id}/credits`, {}, []);
+  const { data } = useTmdb<CreditsResponse>(`${MOVIE_ENDPOINT}/${id}/credits`, {});
 
-  const gridData = (data?.cast ?? []).map((result) => ({
+  const gridData: ImageCell[] = (data?.cast ?? []).map((result) => ({
     id: result.id,
-    imagePath: result.profile_path,
+    imageUrl: getImageUrl(result.profile_path),
     primaryText: result.name,
     secondaryText: result.character,
   }));
@@ -20,9 +19,9 @@ export const CreditsView = () => {
   }
 
   return (
-    <section className="px-2">
-      <h2 className="text-2xl font-bold mb-6">Credits</h2>
-      {data.cast.length ? <ImageGrid results={gridData} /> : <p className="text-gray-400 text-center">No credits available.</p>}
+    <section className="space-y-5 p-5">
+      <h2 className="mb-6 text-2xl font-bold">Credits</h2>
+      {data.cast.length ? <ImageGrid images={gridData} /> : <p className="text-center text-gray-400">No credits available.</p>}
     </section>
   );
 };

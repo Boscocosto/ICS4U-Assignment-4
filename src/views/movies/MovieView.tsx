@@ -1,47 +1,41 @@
-import { LinkGroup, Modal } from '@/components';
-import { IMAGE_BASE_URL, MOVIE_ENDPOINT, ORIGINAL_IMAGE_BASE_URL } from '@/core/constants';
-import type { MovieRepsonse } from '@/core/types';
+import { DetailItem, LinkGroup, Modal } from '@/components';
+import { type MovieRespsonse, getBackdropUrl, getImageUrl, MOVIE_ENDPOINT } from '@/core';
 import { useTmdb } from '@/hooks';
-import { FaCalendarAlt } from 'react-icons/fa';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 
 export const MovieView = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data } = useTmdb<MovieRepsonse>(`${MOVIE_ENDPOINT}/${id}`, { append_to_response: 'videos' }, [id]);
+  const { data } = useTmdb<MovieRespsonse>(`${MOVIE_ENDPOINT}/${id}`, { append_to_response: 'videos' });
 
   const trailerVideo =
-    data?.videos?.results.find((v) => v.site === 'YouTube' && v.type === 'Trailer' && v.name?.toLowerCase().includes('official')) ||
-    data?.videos?.results.find((v) => v.site === 'YouTube' && v.type === 'Trailer');
+    data?.videos?.results.find(
+      (video) => video.site === 'YouTube' && video.type === 'Trailer' && video.name?.toLowerCase().includes('official')
+    ) || data?.videos?.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer');
 
   if (!data) {
     return <p className="text-center text-gray-400">Loading...</p>;
   }
 
   return (
-    <Modal onClose={() => navigate(-1)}>
-      <div className="p-6 space-y-6">
-        <div
-          className="h-[420px] bg-cover bg-center rounded-2xl"
-          style={{
-            backgroundImage: `url(${ORIGINAL_IMAGE_BASE_URL}${data.backdrop_path})`,
-          }}
-        />
-        <div className="flex gap-8">
-          <img className="w-[220px] h-[330px] object-cover rounded-xl" src={`${IMAGE_BASE_URL}${data.poster_path}`} alt={data.title} />
-          <div className="flex-1 space-y-4">
+    <Modal onClick={() => navigate(-1)}>
+      <div className="grid h-full grid-rows-[auto_1fr]">
+        <img className="h-50 w-full rounded-2xl object-cover" src={getBackdropUrl(data.backdrop_path)} alt={data.title} />
+        <div className="grid min-h-0 grid-cols-[auto_1fr] gap-5 p-5">
+          <img className="w-50 rounded-xl object-cover" src={getImageUrl(data.poster_path)} alt={data.title} />
+          <div className="space-y-4 overflow-y-auto">
             <h1 className="text-3xl font-bold">{data.title}</h1>
-            <p className="text-gray-400 flex items-center gap-2">
-              <FaCalendarAlt />
-              {data.release_date}
-            </p>
-            <p className="text-gray-300">{data.overview}</p>
+            <p className="leading-relaxed text-gray-300">{data.overview}</p>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <DetailItem label="Release" value={data.release_date} />
+              <DetailItem label="Rating" value={data.vote_average} />
+            </div>
             {trailerVideo && (
-              <div className="aspect-video">
+              <div className="aspect-video w-[50%]">
                 <iframe
-                  className="w-full h-full rounded-xl"
+                  className="h-full w-full rounded-xl"
                   src={`https://www.youtube.com/embed/${trailerVideo.key}`}
-                  title="Movie Trailer"
+                  title={trailerVideo.name}
                   allowFullScreen
                 />
               </div>
@@ -52,9 +46,9 @@ export const MovieView = () => {
                 { label: 'Reviews', to: 'reviews' },
               ]}
             />
+            <Outlet />
           </div>
         </div>
-        <Outlet />
       </div>
     </Modal>
   );

@@ -1,6 +1,5 @@
 import { ButtonGroup, ImageGrid, Pagination } from '@/components';
-import { TRENDING_ENDPOINT } from '@/core/constants';
-import type { MoviesResponse } from '@/core/types';
+import { getImageUrl, type ImageCell, type MovieRespsonse, TRENDING_ENDPOINT } from '@/core';
 import { useTmdb } from '@/hooks';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -9,12 +8,14 @@ export const TrendingView = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState<number>(1);
   const [searchParams, setSearchParams] = useSearchParams();
+  const mediaType = searchParams.get('type') || 'movies';
   const interval = searchParams.get('interval') || 'day';
-  const { data } = useTmdb<MoviesResponse>(`${TRENDING_ENDPOINT}/${interval}`, { page, time_window: interval }, [page, interval]);
+  const tmdbType = mediaType === 'movies' ? 'movie' : 'tv';
+  const { data } = useTmdb<MovieRespsonse>(`${TRENDING_ENDPOINT}/${tmdbType}/${interval}`, { page, time_window: interval });
 
-  const gridData = (data?.results ?? []).map((result) => ({
+  const gridData: ImageCell[] = (data?.results ?? []).map((result) => ({
     id: result.id,
-    imagePath: result.poster_path,
+    imageUrl: getImageUrl(result.poster_path),
     primaryText: result.original_title,
   }));
 
@@ -23,19 +24,29 @@ export const TrendingView = () => {
   }
 
   return (
-    <section className="max-w-[1200px] mx-auto p-5 space-y-5">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold">Now Playing</h1>
-        <ButtonGroup
-          value={interval}
-          options={[
-            { label: 'Today', value: 'day' },
-            { label: 'Week', value: 'week' },
-          ]}
-          onClick={(value) => setSearchParams({ interval: value })}
-        />
+    <section className="mx-auto max-w-7xl space-y-5 p-5">
+      <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
+        <h1 className="text-3xl font-bold">Trending</h1>
+        <div className="flex gap-4">
+          <ButtonGroup
+            value={mediaType}
+            options={[
+              { label: 'Movies', value: 'movies' },
+              { label: 'TV Shows', value: 'tv' },
+            ]}
+            onClick={(value) => setSearchParams({ type: value })}
+          />
+          <ButtonGroup
+            value={interval}
+            options={[
+              { label: 'Today', value: 'day' },
+              { label: 'Week', value: 'week' },
+            ]}
+            onClick={(value) => setSearchParams({ interval: value })}
+          />
+        </div>
       </div>
-      <ImageGrid results={gridData} onClick={(id) => navigate(`/movie/${id}/credits`)} />
+      <ImageGrid images={gridData} onClick={(image) => navigate(`/${tmdbType}/${image.id}`)} />
       <Pagination page={page} maxPages={data.total_pages} onClick={setPage} />
     </section>
   );

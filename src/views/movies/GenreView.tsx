@@ -1,6 +1,5 @@
 import { ImageGrid, Pagination } from '@/components';
-import { NOW_PLAYING_ENDPOINT } from '@/core/constants';
-import type { MoviesResponse } from '@/core/types';
+import { getImageUrl, NOW_PLAYING_ENDPOINT, type ImageCell, type MovieRespsonse } from '@/core';
 import { useTmdb } from '@/hooks';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 export const GenreView = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState<number>(1);
-  const { data } = useTmdb<MoviesResponse>(NOW_PLAYING_ENDPOINT, { page }, [page]);
+  const { data } = useTmdb<MovieRespsonse>(NOW_PLAYING_ENDPOINT, { page });
 
-  const gridData = (data?.results ?? []).map((result) => ({
+  const gridData: ImageCell[] = (data?.results ?? []).map((result) => ({
     id: result.id,
-    imagePath: result.poster_path,
+    imageUrl: getImageUrl(result.poster_path),
     primaryText: result.original_title,
   }));
 
@@ -21,9 +20,9 @@ export const GenreView = () => {
   }
 
   return (
-    <section className="max-w-[1200px] mx-auto p-5 space-y-5">
-      <h1 className="text-3xl font-bold mb-4">Now Playing</h1>
-      <ImageGrid results={gridData} onClick={(id) => navigate(`/movie/${id}/credits`)} />
+    <section className="mx-auto max-w-7xl space-y-5 p-5">
+      <h1 className="mb-4 text-3xl font-bold">Now Playing</h1>
+      <ImageGrid images={gridData} onClick={(image) => navigate(`/movie/${image.id}/credits`)} />
       <Pagination page={page} maxPages={data.total_pages} onClick={setPage} />
     </section>
   );
