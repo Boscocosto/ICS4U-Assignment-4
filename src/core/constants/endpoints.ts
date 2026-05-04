@@ -3,4 +3,4 @@ export const NOW_PLAYING_ENDPOINT = 'https://api.themoviedb.org/3/movie/now_play
 export const TRENDING_ENDPOINT = 'https://api.themoviedb.org/3/trending';
 export const SEARCH_ENDPOINT = 'https://api.themoviedb.org/3/search/';
 export const DISCOVER_ENDPOINT = 'https://api.themoviedb.org/3/discover/';
-export const PERSON_ENDPOINT = 'https://api.themoviedb.org/3/person/'
+export const PERSON_ENDPOINT = 'https://api.themoviedb.org/3/person/';

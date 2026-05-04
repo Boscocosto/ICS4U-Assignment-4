@@ -25,7 +25,7 @@ export const TrendingView = () => {
 
   return (
     <section className="mx-auto max-w-7xl space-y-5 p-5">
-      <div className="mb-4 flex items-center justify-between flex-wrap gap-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Trending</h1>
         <div className="flex gap-4">
           <ButtonGroup
