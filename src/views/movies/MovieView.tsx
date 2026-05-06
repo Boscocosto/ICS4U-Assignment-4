@@ -1,21 +1,21 @@
 import { DetailItem, LinkGroup, Modal } from '@/components';
-import { type MovieRespsonse, getBackdropUrl, getImageUrl, MOVIE_ENDPOINT } from '@/core';
+import { type MovieResponse, getBackdropUrl, getImageUrl, MOVIE_ENDPOINT, TV_ENDPOINT } from '@/core';
 import { useTmdb } from '@/hooks';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const MovieView = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data } = useTmdb<MovieRespsonse>(`${MOVIE_ENDPOINT}/${id}`, { append_to_response: 'videos' });
-
-  const trailerVideo =
-    data?.videos?.results.find(
-      (video) => video.site === 'YouTube' && video.type === 'Trailer' && video.name?.toLowerCase().includes('official')
-    ) || data?.videos?.results.find((video) => video.site === 'YouTube' && video.type === 'Trailer');
+  const { pathname } = useLocation();
+  const TvRoute = pathname.startsWith('/tv');
+  const endpoint = TvRoute ? TV_ENDPOINT : MOVIE_ENDPOINT;
+  const { data } = useTmdb<MovieResponse>(`${endpoint}/${id}`, { append_to_response: 'videos' });
 
   if (!data) {
     return <p className="text-center text-gray-400">Loading...</p>;
   }
+
+  const Tv = !!data.first_air_date;
 
   return (
     <Modal onClick={() => navigate(-1)}>
@@ -30,23 +30,23 @@ export const MovieView = () => {
               <DetailItem label="Release" value={data.release_date} />
               <DetailItem label="Rating" value={data.vote_average} />
             </div>
-            {trailerVideo && (
-              <div className="aspect-video w-[50%]">
-                <iframe
-                  className="h-full w-full rounded-xl"
-                  src={`https://www.youtube.com/embed/${trailerVideo.key}`}
-                  title={trailerVideo.name}
-                  allowFullScreen
-                />
-              </div>
-            )}
             <LinkGroup
-              options={[
-                { label: 'Credits', to: 'credits' },
-                { label: 'Reviews', to: 'reviews' },
-              ]}
+              options={
+                Tv
+                  ? [
+                      { label: 'Seasons', to: 'seasons' },
+                      { label: 'Credits', to: 'credits' },
+                      { label: 'Reviews', to: 'reviews' },
+                      { label: 'Trailers', to: 'trailers' },
+                    ]
+                  : [
+                      { label: 'Credits', to: 'credits' },
+                      { label: 'Reviews', to: 'reviews' },
+                      { label: 'Trailers', to: 'trailers' },
+                    ]
+              }
             />
-            <Outlet />
+            <Outlet context={{ data }} />
           </div>
         </div>
       </div>

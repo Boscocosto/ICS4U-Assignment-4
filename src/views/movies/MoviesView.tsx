@@ -1,5 +1,5 @@
 import { ImageGrid, Pagination } from '@/components';
-import { getImageUrl, type ImageCell, type MovieRespsonse, MOVIE_ENDPOINT } from '@/core';
+import { getImageUrl, MOVIE_ENDPOINT, type ImageCell, type MovieResponse } from '@/core';
 import { useTmdb } from '@/hooks';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -10,7 +10,7 @@ export const MoviesView = () => {
   const movieCategory = category || 'now_playing';
   const [page, setPage] = useState<number>(1);
 
-  const { data } = useTmdb<MovieRespsonse>(`${MOVIE_ENDPOINT}/${movieCategory}`, { page, movieCategory });
+  const { data } = useTmdb<MovieResponse>(`${MOVIE_ENDPOINT}/${movieCategory}`, { page, movieCategory });
 
   const gridData: ImageCell[] = (data?.results ?? []).map((result) => ({
     id: result.id,
@@ -28,15 +28,15 @@ export const MoviesView = () => {
   if (!data) return <p className="text-center text-gray-400">Loading...</p>;
 
   return (
-    <section className="max-w-7xl mx-auto space-y-5 p-5">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+    <section className="mx-auto max-w-7xl space-y-5 p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">Movies</h1>
         <div className="flex gap-2">
           {categories.map((c) => (
             <button
               key={c.key}
-              onClick={() => navigate(`/movies/${c.key}`)}
-              className={`px-4 py-2 rounded ${movieCategory === c.key ? 'bg-blue-500' : 'bg-gray-700'} text-white`}
+              onClick={() => navigate(`/movies/category/${c.key}`)}
+              className={`rounded px-4 py-2 ${movieCategory === c.key ? 'bg-blue-500' : 'bg-gray-700'} text-white`}
             >
               {c.label}
             </button>
