@@ -2,7 +2,7 @@ export * from '@/views/movies/CareerView';
 export * from '@/views/movies/CreditsView';
 export * from '@/views/movies/EpisodeView';
 export * from '@/views/movies/GenreView';
-export * from '@/views/movies/Imagesview';
+export * from '@/views/movies/ImagesView';
 export * from '@/views/movies/MoviesView';
 export * from '@/views/movies/MovieView';
 export * from '@/views/movies/NowPlayingView';
