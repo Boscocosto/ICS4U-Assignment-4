@@ -1,4 +1,4 @@
-import { ButtonGroup, ImageGrid, Pagination, SearchBar } from '@/components';
+import { ImageGrid, Pagination, } from '@/components';
 import { type ImageCell, type SearchResponse, getImageUrl, RATE_LIMIT_DELAY, SEARCH_ENDPOINT } from '@/core';
 import { useDebounce, useTmdb } from '@/hooks';
 import { useState } from 'react';
@@ -6,16 +6,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const SearchView = () => {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+  const [query] = useState('');
   const [page, setPage] = useState<number>(1);
   const debouncedQuery = useDebounce(query, RATE_LIMIT_DELAY);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const type = searchParams.get('type') ?? 'movie';
   const { data } = useTmdb<SearchResponse>(`${SEARCH_ENDPOINT}/${type}`, { query: debouncedQuery, page });
-
-  const updateParam = (key: string, value: string) => {
-    setSearchParams({ type, [key]: value });
-  };
 
   const gridData: ImageCell[] = (data?.results ?? []).map((result) => ({
     id: result.id,
@@ -30,16 +26,6 @@ export const SearchView = () => {
   return (
     <section className="mx-auto w-full max-w-7xl space-y-5 p-5">
       <h1 className="mb-4 text-3xl font-bold">Search</h1>
-      <SearchBar value={query} onChange={setQuery} />
-      <ButtonGroup
-        value={type}
-        options={[
-          { label: 'Movies', value: 'movie' },
-          { label: 'TV Shows', value: 'tv' },
-          { label: 'Person', value: 'person' },
-        ]}
-        onClick={(value) => updateParam('type', value)}
-      />
       <ImageGrid
         images={gridData}
         onClick={(image) => {

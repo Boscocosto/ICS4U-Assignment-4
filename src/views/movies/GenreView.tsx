@@ -37,13 +37,13 @@ export const GenreView = () => {
   const [page, setPage] = useState<number>(1);
   const { data } = useTmdb<GenreResponse>(`${DISCOVER_ENDPOINT}/${mediaType}`, { with_genres: genreId, page });
 
-  const handleMediaTypeChange = (type: string) => {
+  const MediaTypeChange = (type: string) => {
     const firstGenre = (type === 'movie' ? movieGenres : tvGenres)[0].value;
     navigate(`/genre/${type}/${firstGenre}`);
     setPage(1);
   };
 
-  const handleGenreChange = (value: string) => {
+  const GenreChange = (value: string) => {
     navigate(`/genre/${mediaType}/${value}`);
     setPage(1);
   };
@@ -60,13 +60,13 @@ export const GenreView = () => {
       <div className="flex flex-wrap gap-4">
         <div className="flex gap-2">
           <button
-            onClick={() => handleMediaTypeChange('movie')}
+            onClick={() => MediaTypeChange('movie')}
             className={`rounded px-4 py-2 ${mediaType === 'movie' ? 'bg-blue-500' : 'bg-gray-700'} text-white`}
           >
             Movies
           </button>
           <button
-            onClick={() => handleMediaTypeChange('tv')}
+            onClick={() => MediaTypeChange('tv')}
             className={`rounded px-4 py-2 ${mediaType === 'tv' ? 'bg-blue-500' : 'bg-gray-700'} text-white`}
           >
             TV Shows
@@ -76,7 +76,7 @@ export const GenreView = () => {
           {genres.map((genre) => (
             <button
               key={genre.id}
-              onClick={() => handleGenreChange(genre.value)}
+              onClick={() => GenreChange(genre.value)}
               className={`rounded px-4 py-2 text-white ${genreValue === genre.value ? 'bg-blue-500' : 'bg-gray-700'}`}
             >
               {genre.name}

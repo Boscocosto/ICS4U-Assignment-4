@@ -9,7 +9,7 @@ export const MovieView = () => {
   const { pathname } = useLocation();
   const TvRoute = pathname.startsWith('/tv');
   const endpoint = TvRoute ? TV_ENDPOINT : MOVIE_ENDPOINT;
-  const { data } = useTmdb<MovieResponse>(`${endpoint}/${id}`, { append_to_response: 'videos' });
+  const { data } = useTmdb<MovieResponse>(`${endpoint}/${id}`, {});
 
   if (!data) {
     return <p className="text-center text-gray-400">Loading...</p>;
